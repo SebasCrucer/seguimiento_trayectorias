@@ -26,9 +26,6 @@ function [mvAccFrames, mvFrames, frames] = getMovement(videoFile, gap, sigma)
         mvAccFrames += mvFrame;
     end
     figure
-    title('difFrame')
-    imhist(difFrame(:))
-    figure
     title('actualFrame')
     imhist(actualFrame(:))
 end
