@@ -1,20 +1,34 @@
-function [mvAccFrames, mvFrames, frames] = getMovement(videoFile, gap, showAcc = false)
-    frames = processVideoFrames(videoFile, @rgb2gray);
+function [mvAccFrames, mvFrames, frames] = getMovement(videoFile, gap, sigma)
+    frames = processVideoFrames(videoFile, @(f) transformFrame(f, sigma));
+    matFrames = cat(3, frames{:});
 
-    [rows, cols] = size(frames{1});
+    [rows, cols, numFrames] = size(matFrames);
     mvAccFrames = zeros(rows, cols);
-    mvFrames = {};
-    for f = 1 + gap:length(frames)
-      mvFrames = abs(frames{f} - frames{f - gap});
-      newFrames{f - gap} = mvFrames;
-      mvAccFrames+=mvFrames;
-    endfor
+    mvFrames = cell(1, numFrames - gap);
 
-    createVideoWithFFmpeg(newFrames, 'outputs/output.mp4', 30)
-    imwrite(mat2gray(mvAccFrames), 'outputs/accumulated_image.png');
-    if(showAcc)
-      imshow(mvAccFrames)
-    endif
+    for f = 1 + gap:numFrames
+        actualFrame = matFrames(:, :, f);
 
-endfunction
+        histFrames = matFrames(:, :, 1:f);
 
+        background = median(histFrames, 3);
+
+        difFrame = abs(background - actualFrame);
+
+        otsuThresh = otsuthresh(difFrame(:));
+        thresholded = background * otsuThresh;
+
+        mvFrame = difFrame >= thresholded;
+
+        mvFrame = difFrame >= thresholded;
+
+        mvFrames{f - gap} = mvFrame;
+        mvAccFrames += mvFrame;
+    end
+    figure
+    title('difFrame')
+    imhist(difFrame(:))
+    figure
+    title('actualFrame')
+    imhist(actualFrame(:))
+end
