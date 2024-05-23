@@ -16,16 +16,10 @@ function [mvAccFrames, mvFrames, frames] = getMovement(videoFile, gap, sigma)
         difFrame = abs(background - actualFrame);
 
         otsuThresh = otsuthresh(difFrame(:));
-        thresholded = background * otsuThresh;
 
-        mvFrame = difFrame >= thresholded;
-
-        mvFrame = difFrame >= thresholded;
+        mvFrame = difFrame >= otsuThresh * max(difFrame(:));
 
         mvFrames{f - gap} = mvFrame;
         mvAccFrames += mvFrame;
     end
-    figure
-    title('actualFrame')
-    imhist(actualFrame(:))
 end

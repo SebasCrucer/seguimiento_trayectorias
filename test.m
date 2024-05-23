@@ -1,7 +1,7 @@
 close all; clearvars; clc;
 
 videoFile = 'assets/DM_avenidas.mp4'
-evalRange = 5;
+evalRange = 20;
 filterSigma = 1;
 
 frameHeight = 480;
@@ -32,7 +32,5 @@ colorbar;
 print(i1, 'outputs/imagesc_jet_colorbar.png', '-dpng');
 close(i1);
 
-i2 = figure('visible', 'off');
+figure;
 surf(mvAccFrames);
-print(i2, 'outputs/surf_plot.png', '-dpng');
-close(i2);
