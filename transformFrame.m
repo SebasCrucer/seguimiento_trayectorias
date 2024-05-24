@@ -3,7 +3,9 @@ function tFrame = transformFrame(frame, sigma, ROI)
   tFrame = rgb2gray(frame);
   [rows, cols] = size(tFrame);
   ones = ones(rows, cols);
-  mask = ROI(ones);
-  tFrame = tFrame.* mask;
+   if nargin > 3 && isa(ROI, 'function_handle')
+    mask = ROI(ones);
+    tFrame = tFrame.* mask;
+   end
   tFrame = imsmooth(tFrame,'Gaussian', sigma);
 endfunction

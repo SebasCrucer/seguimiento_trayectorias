@@ -1,14 +1,16 @@
 close all; clearvars; clc;
 
-videoFile = 'assets/DM_avenidas.mp4'
+% videoFile = 'assets/DM_avenidas.mp4'
+videoFile = 'assets/video.mp4'
+
 evalRange = 10;
 filterSigma = 1;
 
-function mask = ROI(mask)
-  mask(1:30, 1:end) = 0;
-endfunction
+%function mask = ROI(mask)
+%  mask(1:30, 1:end) = 0;
+%endfunction
 
-[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma, @ROI);
+[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma);
 
 mvAccFrames = mvAccFrames;
 mvFrames = cat(3, mvFrames{:});
