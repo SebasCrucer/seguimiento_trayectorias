@@ -1,5 +1,5 @@
-function [mvAccFrames, mvFrames, frames] = getMovement(videoFile, gap, sigma)
-    frames = processVideoFrames(videoFile, @(f) transformFrame(f, sigma));
+function [mvAccFrames, mvFrames, frames] = getMovement(videoFile, gap, sigma, ROI)
+    frames = processVideoFrames(videoFile, @(f) transformFrame(f, sigma, ROI));
     matFrames = cat(3, frames{:});
 
     [rows, cols, numFrames] = size(matFrames);

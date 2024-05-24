@@ -1,21 +1,20 @@
 close all; clearvars; clc;
 
 videoFile = 'assets/DM_avenidas.mp4'
-evalRange = 20;
+evalRange = 10;
 filterSigma = 1;
 
-frameHeight = 480;
-frameWidth = 704;
-ROI = ones(frameHeight, frameWidth);
-ROI(1:30, 1:end) = 0;
+function mask = ROI(mask)
+  mask(1:30, 1:end) = 0;
+endfunction
 
-[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma);
+[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma, @ROI);
 
-mvAccFrames = mvAccFrames.*ROI;
+mvAccFrames = mvAccFrames;
 mvFrames = cat(3, mvFrames{:});
 
 for i = 1:size(mvFrames, 3)
-    mvFrames(:, :, i) = mvFrames(:, :, i) .* ROI;
+    mvFrames(:, :, i) = mvFrames(:, :, i);
 end
 
 mvFrames = mat2cell(mvFrames, size(mvFrames, 1), size(mvFrames, 2), ones(1, size(mvFrames, 3)));
