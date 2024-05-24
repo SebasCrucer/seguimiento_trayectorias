@@ -9,7 +9,10 @@ function mask = ROI(mask)
   mask(1:30, 1:end) = 0;
 endfunction
 
-[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma, @ROI);
+[mvAccFrames, mvFrames, frames] = getMovement(videoFile, evalRange, filterSigma, @ROI);
+
+% guardo el video del preprocesado
+createVideoWithFFmpeg(frames, 'outputs/preprocessed.mp4', 30);
 
 % guardo video del movimiento
 createVideoWithFFmpeg(mvFrames, 'outputs/movement.mp4', 30);
