@@ -1,31 +1,37 @@
 close all; clearvars; clc;
 
-% videoFile = 'assets/DM_avenidas.mp4'
-videoFile = 'assets/video.mp4'
+videoFile = 'assets/DM_avenidas.mp4'
 
 evalRange = 10;
 filterSigma = 1;
 
-%function mask = ROI(mask)
-%  mask(1:30, 1:end) = 0;
-%endfunction
+function mask = ROI(mask)
+  mask(1:30, 1:end) = 0;
+endfunction
 
-[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma);
+[mvAccFrames, mvFrames] = getMovement(videoFile, evalRange, filterSigma, @ROI);
 
-mvAccFrames = mvAccFrames;
-mvFrames = cat(3, mvFrames{:});
+% guardo video del movimiento
+createVideoWithFFmpeg(mvFrames, 'outputs/movement.mp4', 30);
 
-for i = 1:size(mvFrames, 3)
-    mvFrames(:, :, i) = mvFrames(:, :, i);
-end
+% creo y guardo video de barrido del movimiento
+mvSweepFrames = cell(size(mvFrames));
+mvSweepFramesAcc = zeros(size(mvFrames{1}));
+for f = 1:size(mvSweepFrames, 2)
+  mvSweepFramesAcc+=mvFrames{f};
+  mvSweepFrames{f} = mvSweepFramesAcc;
+endfor
+createVideoWithFFmpeg(mvSweepFrames, 'outputs/movement_sweep.mp4', 30);
 
-mvFrames = mat2cell(mvFrames, size(mvFrames, 1), size(mvFrames, 2), ones(1, size(mvFrames, 3)));
+% guardo imagen del movimento acumulado en escala de grises
+scaledMvAccFrames = (255/max(mvAccFrames(:)))*mvAccFrames;
+imwrite(mat2gray(scaledMvAccFrames), 'outputs/accumulated_image.png');
 
-createVideoWithFFmpeg(mvFrames, 'outputs/output.mp4', 30);
-
+% guardo imagen del movimiento binarizado
 binaryMvAccFrames = mvAccFrames >= 1;
-imwrite(mat2gray(binaryMvAccFrames), 'outputs/accumulated_image.png');
+imwrite(mat2gray(binaryMvAccFrames), 'outputs/binary_image.png');
 
+% creo imagen de mapa de calor
 i1 = figure('visible', 'off');
 imagesc(mvAccFrames);
 colormap(jet);
@@ -33,5 +39,6 @@ colorbar;
 print(i1, 'outputs/imagesc_jet_colorbar.png', '-dpng');
 close(i1);
 
+% muestro mapa 3d
 figure;
 surf(mvAccFrames);
